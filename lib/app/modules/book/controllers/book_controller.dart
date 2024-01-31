@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:dio/dio.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 
@@ -12,6 +15,7 @@ class BookController extends GetxController with StateMixin<List<DataBook>>{
   @override
   void onInit() {
     super.onInit();
+    getData();
   }
 
   @override
@@ -23,32 +27,34 @@ class BookController extends GetxController with StateMixin<List<DataBook>>{
   void onClose() {
     super.onClose();
   }
-
-  Future<void> getData() async {
+  getData() async {
     change(null, status: RxStatus.loading());
-    try {
-      final response = await ApiProvider.instance().get(Endpoint.book);
-      if (response.statusCode == 200) {
-        final ResponseBook responseBook = ResponseBook.fromJson(response.data);
-        if(responseBook.data!.isEmpty){
-          change(null, status: RxStatus.empty());
-        }else{
-          change(responseBook.data, status: RxStatus.success());
-        }
-      } else {
-        change(null, status: RxStatus.error("Gagal mengambil data"));
-      }
+    try{
 
-    } on DioException catch (e) {
-      if (e.response != null) {
-        if (e.response?.data != null) {
-          change(null, status: RxStatus.error("${e.response?.data['message']}"));
+        final response = await ApiProvider.instance().get(Endpoint.book,
+
+        );
+        if (response.statusCode == 200) {
+          final ResponseBook responseBook = ResponseBook.fromJson(response.data);
+          if (responseBook.data!.isEmpty){
+            change(null, status: RxStatus.empty());
+          } else {
+            change(responseBook.data, status: RxStatus.success());
+          }
+        } else {
+          change(null, status: RxStatus.error("Gagal mengambil data"));
         }
-      } else {
-        change(null, status: RxStatus.error(e.message ?? ""));
+    } on DioException catch (e) {
+        if (e.response != null) {
+          if (e.response?.data != null){
+            log(("dio ${e.response?.data['message']}"));
+            change(null, status: RxStatus.error("dio ${e.response?.data['message']}"));
+          }
+        } else {
+          change(null, status: RxStatus.error("cek "+(e.message ?? "")));
       }
     } catch (e) {
-      change(null, status: RxStatus.error(e.toString()));
+      change(null, status: RxStatus.error("catch "+e.toString()));
     }
   }
 }

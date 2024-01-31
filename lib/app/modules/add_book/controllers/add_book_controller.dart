@@ -20,8 +20,8 @@ class AddBookController extends GetxController {
   final TextEditingController penerbitController = TextEditingController();
   final TextEditingController tahunController = TextEditingController();
   final BookController _bookController = Get.find();
-
   final count = 0.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -37,10 +37,8 @@ class AddBookController extends GetxController {
     super.onClose();
   }
 
-  void increment() => count.value++;
-  final loadingBook = false.obs;
   addBook() async {
-    loadingBook(true);
+    loading(true);
     try{
       FocusScope.of(Get.context!).unfocus();
       formKey.currentState?.save();
@@ -61,14 +59,22 @@ class AddBookController extends GetxController {
           Get.snackbar("Sorry", "Login Gagal", backgroundColor: Colors.orange);
         }
       }
-      loadingBook(false);
+      loading(false);
     } on dio.DioException catch (e) {
-      loadingBook(false);
-      Get.snackbar("Sorry", e.message ?? "", backgroundColor: Colors.red);
-    } catch (e) {
-      loadingBook(false);
+      loading(false);
+      if (e.response != null) {
+        if (e.response?.data != null) {
+          Get.snackbar("Sorry", "${e.response?.data['message']}",
+              backgroundColor: Colors.orange);
+        }
+      } else {
+        Get.snackbar("Sorry", e.message ?? "", backgroundColor: Colors.red);
+      }
+    }
+      catch (e) {
+      loading(false);
       Get.snackbar("Error", e.toString(), backgroundColor: Colors.red);
-      throw Exception('Error: $e');
     }
   }
 }
+
