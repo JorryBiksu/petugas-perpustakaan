@@ -13,7 +13,6 @@ import '../../book/controllers/book_controller.dart';
 
 class AddBookController extends GetxController {
   final loading = false.obs;
-  //TODO: Implement AddBookController
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController judulController = TextEditingController();
   final TextEditingController penulisController = TextEditingController();
